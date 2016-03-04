@@ -1,4 +1,12 @@
-require(data.table)
+
+if (!require(data.table)) {
+  install.packages("data.table")
+  require(data.table)
+}
+if (!require("colorspace")) {
+  install.packages("colorspace")
+  require(colorspace)
+}
 ## recursively merge a set of reads that are indexed by tag
 mergeall <- function(mm) {
   merge1 <- function(ll) {
@@ -16,6 +24,12 @@ mergeall <- function(mm) {
     mm <- merge1(mm)
   }
   mm[[1]]
+}
+
+merge_by_tag <- function(d1, d2) {
+  da <- merge(d1, d2, by="tag", all=TRUE)
+  da[is.na(da)] <- 0
+  da
 }
 
 setup <- function(experimentnames) {
@@ -88,3 +102,21 @@ experiments <- scan("all.files", sep="\n",what=character(0))
 experiments <- gsub(pattern = "Mouse ","",experiments)
 experiments <- gsub(pattern = ".xlsx","",experiments)
 ex <- experiments
+
+
+
+
+plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
+  require(colorspace)
+  ptmp <- rowSums(m)/sum(m)
+  u <- ptmp > minp
+  p <- sweep(m[u,], 2, colSums(m[u,]), "/")
+  o <- order(p[,1], decreasing = TRUE)
+  p <- p[o,][1:n_colours,]
+  p <- rbind(p, 1-colSums(p))
+  
+  colours <-c(rainbow_hcl(n_colours, c=90, l=70), "lightgrey")
+  barplot(as.matrix(p), col=colours, beside=FALSE)
+}
+
+
