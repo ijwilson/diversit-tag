@@ -26,11 +26,7 @@ mergeall <- function(mm) {
   mm[[1]]
 }
 
-merge_by_tag <- function(d1, d2) {
-  da <- merge(d1, d2, by="tag", all=TRUE)
-  da[is.na(da)] <- 0
-  da
-}
+
 
 setup <- function(experimentnames) {
   l <- lapply(experimentnames,
@@ -97,14 +93,19 @@ estimatecount2 <- function(count2, count_baseline, min_baseline=0, min_p=0) {
   p_b <- count_baseline[u]/sum(count_baseline[u])
   mean((p-p_b)^2)/mean(p_b*(1-p_b)) - 1/sum(count2) - 1/sum(count_baseline)
 }
+if (!exists("dummy")) {
 ## Code run to get the experiment names
 experiments <- scan("all.files", sep="\n",what=character(0))
 experiments <- gsub(pattern = "Mouse ","",experiments)
 experiments <- gsub(pattern = ".xlsx","",experiments)
 ex <- experiments
+}
 
-
-
+merge_by_tag <- function(d1, d2) {
+  da <- merge(d1, d2, by="tag", all=TRUE)
+  da[is.na(da)] <- 0
+  da
+}
 
 plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
   require(colorspace)
@@ -119,4 +120,24 @@ plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
   barplot(as.matrix(p), col=colours, beside=FALSE)
 }
 
+#############################
+estimate_G <- function(count, count_baseline, min_baseline=0, min_p=0.0) {
+  rawestimatep <- function(p, p_baseline) {
+    mean((p-p_baseline)^2)/mean(p_baseline*(1-p_baseline))
+  } 
+  if (missing(count_baseline)) {
+    p <- 1/length(count)
+    p_b <- count/sum(count)
+    return(mean((p_b-p)^2)*length(count))
+  } else {
+    pbase <- count_baseline/sum(count_baseline)
+    u <- count_baseline>=min_baseline & pbase >= min_p
+    pc <- count[u]/sum(count[u])
+    p_b <- count_baseline[u]/sum(count_baseline[u])
+    return(rawestimatep(pc, p_b))
+  }
+}
+#############################
+estimatecount_equalfreq <- function(count2) {
 
+}
