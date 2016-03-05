@@ -56,7 +56,7 @@ tags across both data sets, sorts by the frequency in the first column, and plot
 plot_tagfreq(ex[, -1],  n_colours=20)
 ```
 
-![tag plot](plot1.png)
+![tag plot](fig/plot1.png)
 
 
 ### Estimating Nei's G
