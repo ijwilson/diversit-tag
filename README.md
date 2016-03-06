@@ -59,6 +59,29 @@ plot_tagfreq(ex[, -1],  n_colours=20)
 ![tag plot](fig/plot1.png)
 
 
+### Shared Tags
+
+We can tabulate the sharing of tags by considering when tags 
+have been shared between two populations using the basic R `table` command. 
+```
+table(A=ex$Pop1_A>0, C=ex$Pop1_C>0)
+```
+
+This does not distinguish between rare an common alleles.  We can improve this by working with the tag relative frequencies.  Get the frequencies 
+`freq` by sweeping out the sum of tags.  * Note that `ex[, -1]` removes 
+returns a `data.frame` without the first column of tag names.
+
+```
+freq <- sweep(ex[,-1], 2, colSums(ex[, -1]), "/")
+rownames(freq) <- ex[,1]
+
+table(A=cut(freq$Pop1_A, c(0,0.0001,0.005,1)),
+      C=cut(freq$Pop1_C, c(0,0.0001,0.005,1)))
+```
+
+Simple R functions have been added to simplify the analysis of tag sharing.  
+
+
 ### Estimating Nei's G
 
 We estimate Nei's G using the function `estimate_G`.  This takes a 
@@ -72,7 +95,21 @@ estimate_G(ex$Pop1_A, ex$Pop2_A, min_p=0.0001)
 estimate_G(ex$Pop2_C, ex$Pop1_A, min_p=0.0001)
 ```
 
+### Distances Between Tags
 
+If tags are coded as DNA then the distances between tags can be simply measured by using the `stringdist` library.
 
+```{r}
+stringdist(ex$tag[1], ex$tag[2])
+```
 
+The function `tagdistplot` allows you to get plot the frequencies of 
+all the tags vs. the distance from the most frequent tag (in addition those tags that are 1 step away from the 2nd, 3rd, ... , `howmany`) tags are colour coded.  This allows you to see how 1-step errors are a major 
+reason for low frequency variants in some runs.
+
+```
+tagdistplot(ex$tag, freq$Pop1_A, howmany=4)
+```
+
+![plot of closest tags](fig/closest.png)
 
