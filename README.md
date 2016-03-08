@@ -82,18 +82,6 @@ table(A=cut(freq$Pop1_A, c(0,0.0001,0.005,1)),
 Simple R functions have been added to simplify the analysis of tag sharing.  
 
 
-### Estimating Nei's G
-
-We estimate Nei's G using the function `estimate_G`.  This takes a 
-pair of parameters, the first is the count, the second, if present gives 
-the frequency of tags in a baseline population.  If this is not present then an equal frequency in the baseline is assumed.
-
-
-```{r}
-estimate_G(ex$Pop1_A)
-estimate_G(ex$Pop1_A, ex$Pop2_A, min_p=0.0001)
-estimate_G(ex$Pop2_C, ex$Pop1_A, min_p=0.0001)
-```
 
 ### Distances Between Tags
 
@@ -111,5 +99,23 @@ reason for low frequency variants in some runs.
 tagdistplot(ex$tag, freq$Pop1_A, howmany=4)
 ```
 
+
+### Estimating Nei's G
+
+
+$$ 
+a = \Sum_{i=1} c_i
+$$
+
+We estimate Nei's G using the function `estimate_G`.  This takes a 
+pair of parameters, the first is the count, the second, if present gives 
+the frequency of tags in a baseline population.  If this is not present then an equal frequency in the baseline is assumed.
+
+
+```{r}
+estimate_G(ex$Pop1_A)
+estimate_G(ex$Pop1_A, ex$Pop2_A, min_p=0.0001)
+estimate_G(ex$Pop2_C, ex$Pop1_A, min_p=0.0001)
+```
 ![plot of closest tags](fig/closest.png)
 
