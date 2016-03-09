@@ -1,7 +1,7 @@
 # diversit-tag
 
 
-R code for invesigating changes in diversity for a massively multi-allelic system. 
+R code for investigating changes in diversity for a massively multi-allelic system. 
 
 
 ## The Model
@@ -10,7 +10,7 @@ R code for invesigating changes in diversity for a massively multi-allelic syste
 ## Data Format
 
 Raw data should be in files with the first column a set of tags, labelled tag,
-other columns then give the counts in a set of organs.  Example 
+other columns then give the counts in a set of tissues/cells.  Example 
 data sets are given in the files `/data/example1.txt` and `/data/example2.txt`.
 
 The first few lines of `example1.txt` look like
@@ -104,7 +104,7 @@ tagdistplot(ex$tag, freq$Pop1_A, howmany=4)
 
 ![plot of closest tags](fig/closest.png)
 
-We can see how there is a large cluster of tags that are a single step 
+We can see how there is a cluster of tags that are a single step 
 away from the most frequent tag.
 
 ## Estimating Nei's G
@@ -115,7 +115,12 @@ away from the most frequent tag.
 
 In the case of the first transplant a number of tags are selected from 
 a pool with equal frequencies and then we observe the number of counts 
-after sequencing.  
+after sequencing. 
+
+$$
+\hat{G} = k/(k-1)  \sum_i (p_i-1/k)^2,
+$$
+where k is the number of tags, and $p_i$ is the frequency of the $i$th tag. 
 
 #### Drift from baseline
 
@@ -135,15 +140,16 @@ can correct
 
 ### R Functions
 
-We estimate Nei's G using the function `estimate_G`.  This can take four parameters.
+Estimate Nei's G using the function `estimate_G`.  This can take five parameters.
 
-* The first is the count in the tissueof interrest
-* The second (if present) gives the frequency of tags in a baseline population.  If this is not 
+* `count`. A vector of tag counts.
+* `baseline_count`.  The second (if present) is a vector of tag counts, of the same length of `count` which gives the tag counts in a baseline population.  If this is not 
 present then an equal frequency in the baseline is assumed.
 * The third (called `min_count`) is a filter on the tags.  If any tag has a count of less
 than `min_count` in the baseline, then it is not used in the estimate.
-* The fourth (`min_p`) is another filter on the tags.  If any tag has a relative frequency of less
-than `min_p` in the baseline then it is not used in the estimates.
+* The fourth (`min_p`) is another filter on the tags.  If any tag has a relative frequency of less than `min_p` in the baseline then it is not used in the estimates.
+* A Final option is `corrected`.  By default it is `FALSE`, but for low overall 
+count it corrects for variability caused by low numbers of tags.
 
 ```{r}
 estimate_G(ex$Pop1_A)
@@ -154,15 +160,28 @@ estimate_G(ex$Pop2_C, ex$Pop1_A, min_count=100)
 
 #### Performance of Estimator
 
-We can test the performance of this estimator by comparing with simulated data.
+We can test the performance of this estimator by comparing with simulated data.  We can see that the performace of the corrected estimator is better for analysis with low total depth.
 
 ```{r}
-Estimated_G <- numeric(1000)
+Estimated_G <- numeric(3000)
 for (i in 1:1000) {
-   aa <- simulate_drifttags(1000, 200000, drift_G=0.05)
+   aa <- simulate_drifttags(1000, 100000, drift_G=0.01)
    Estimated_G[i] <- estimate_G(aa$count, aa$background_count)
 }
-require(ggplot2)
-qplot(Estimated_G, binwidth=0.01)
+for (i in 1:1000) {
+   aa <- simulate_drifttags(1000, 1000, drift_G=0.01)
+   Estimated_G[1000+i] <- estimate_G(aa$count, aa$background_count)
+   Estimated_G[2000+i] <- estimate_G(aa$count, aa$background_count, corrected=TRUE)
+}
+d <- data.frame(Estimated_G, depth=gl(3,1000,labels=c("depth=100000", "depth=1000", "depth=1000, Corrected")))
+ggplot(d, aes(x=Estimated_G)) + geom_histogram(binwidth=0.001) + facet_grid(depth~.)
 ```
+```
+round(tapply(d$Estimated_G, d$depth, mean), 4)
+         depth=100000            depth=1000 depth=1000, Corrected 
+               0.0101                0.0119                0.0099 
+```
+
+
+![Simulated values](fig/sim.png)
 

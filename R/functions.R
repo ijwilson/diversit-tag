@@ -11,13 +11,18 @@ if (!require("stringdist")) {
   install.packages("stringdist")
   require(stringdist)
 }
+if (!require("ggplot2")) {
+  install.packages("ggplot2")
+  require(stringdist)
+}
 
+#############################
 merge_by_tag <- function(d1, d2) {
   da <- merge(d1, d2, by="tag", all=TRUE)
   da[is.na(da)] <- 0
   da
 }
-
+#############################
 plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
   require(colorspace)
   ptmp <- rowSums(m)/sum(m)
@@ -30,26 +35,32 @@ plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
   colours <-c(rainbow_hcl(n_colours, c=90, l=70), "lightgrey")
   barplot(as.matrix(p), col=colours, beside=FALSE)
 }
-
 #############################
-estimate_G <- function(count, count_baseline, min_baseline=0, min_p=0.0) {
+estimate_G <- function(count, count_baseline, min_baseline=0, min_p=0.0, corrected=FALSE) {
   rawestimatep <- function(p, p_baseline) {
     mean((p-p_baseline)^2)/mean(p_baseline*(1-p_baseline))
   } 
   if (missing(count_baseline)) {
-    p <- 1/length(count)
+    k <- length(count)
+    p <- 1/k
     p_b <- count/sum(count)
-    return(mean((p_b-p)^2)*length(count))
+    est <- sum((p_b-p)^2)*k/(k-1)
+    if (corrected) 
+      est <- est - 1/sum(count)
   } else {
     pbase <- count_baseline/sum(count_baseline)
     u <- count_baseline>=min_baseline & pbase >= min_p
     pc <- count[u]/sum(count[u])
     p_b <- count_baseline[u]/sum(count_baseline[u])
-    return(rawestimatep(pc, p_b))
+    est <- rawestimatep(pc, p_b)
+    if (corrected)
+      est <- est - 1/sum(count) - 1/sum(count_baseline)
   }
+  est
 }
 ##############################################
 tagdistplot <- function(tags, f, howmany=5) {
+  require(ggplot2)
   maxtags <- tags[order(f, decreasing = TRUE)][1:howmany]
   tag1closest <- rep("none", length(tags))
   labels=c(c("1st", "2nd", "3rd"), paste(4:20,"th", sep=""))
@@ -61,7 +72,7 @@ tagdistplot <- function(tags, f, howmany=5) {
   u <- d>0 & f>0
   
   pl <- ggplot(data.frame(x=d[u], y=f[u], closest=factor(tag1closest[u])),aes(x=x,y=y, col=closest)) 
-  pl <- pl + geom_jitter(width=0.05, alpha=0.8) + scale_y_log10("Frequency of Tag") 
+  pl <- pl + geom_jitter(width=0.1, alpha=0.8) + scale_y_log10("Frequency of Tag") 
   pl <- pl + scale_x_continuous("Distance from Most Frequent Tag", breaks=c(1,4,8,12))
   pl + scale_colour_brewer(palette="Dark2")
 }
