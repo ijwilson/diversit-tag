@@ -23,7 +23,7 @@ merge_by_tag <- function(d1, d2) {
   da
 }
 #############################
-plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
+plot_tagfreq <- function(m, n_colours=12, minp=0.005, showaxis=FALSE, ...) {
   require(colorspace)
   ptmp <- rowSums(m)/sum(m)
   u <- ptmp > minp
@@ -33,7 +33,7 @@ plot_tagfreq <- function(m, n_colours=12, minp=0.005) {
   p <- rbind(p, 1-colSums(p))
   
   colours <-c(rainbow_hcl(n_colours, c=90, l=70), "lightgrey")
-  barplot(as.matrix(p), col=colours, beside=FALSE)
+  barplot(as.matrix(p), col=colours, beside=FALSE, axes=showaxis, ...)
 }
 #############################
 estimate_G <- function(count, count_baseline, min_baseline=0, min_p=0.0, corrected=FALSE) {
