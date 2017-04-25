@@ -38,7 +38,7 @@ The R function `merge_by_tag` allows you to merge data sets
 together.  Tags that are not present in either of the data sets 
 will be given a zero count.
 
-```{r}
+```
 source("R/functions.R")
 ex <- merge_by_tag(ex1, ex2)
 ```
