@@ -27,7 +27,7 @@ AAATCGCGATGCAAAGCGGTTTAACCC|   1213  |  365   |    400
 
 These can be read into R in the usual way
 
-````
+```
 ex1 <- read.table("data/example1.txt", header=TRUE, stringsAsFactors=FALSE)
 ex2 <- read.table("data/example2.txt", header=TRUE, stringsAsFactors=FALSE)
 ```
