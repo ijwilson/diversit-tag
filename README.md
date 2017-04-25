@@ -67,8 +67,9 @@ have been shared between two populations using the basic R `table` command.
 table(A=ex$Pop1_A>0, C=ex$Pop1_C>0)
 ```
 
-This does not distinguish between rare an common alleles.  We can improve this by working with the tag relative frequencies.  Get the frequencies 
-`freq` by sweeping out the sum of tags.  * Note that `ex[, -1]` removes 
+This does not distinguish between rare and common alleles.  We can improve this by 
+working with the tag relative frequencies.  Get the frequencies 
+`freq` by sweeping out the sum of tags.  * Note that `ex[, -1]`  
 returns a `data.frame` without the first column of tag names.
 
 ```
