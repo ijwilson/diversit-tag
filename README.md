@@ -16,13 +16,13 @@ data sets are given in the files `/data/example1.txt` and `/data/example2.txt`.
 The first few lines of `example1.txt` look like
 
 
-            tag            |  Pop1_A | Pop1_B | Pop1_C 
----------------------------|---------|--------|--------
-AAATCACGATGGAAATTGGTTAAACCC|   765   |   61   |     75   
-AAATCATGATGCAAAACGGTTCAACAT|   387   |  154   |    156   
-AAATCCCGATGCAAACTGGTACAACTC|   1849  |17374   |     20   
-AAATCCCGATGCAAATCGGTTTAACTC|   2338  |  888   |    403   
-AAATCGCGATGCAAAGCGGTTTAACCC|   1213  |  365   |    400   
+|            tag            |  Pop1_A | Pop1_B | Pop1_C |
+|---------------------------|---------|--------|--------|
+|AAATCACGATGGAAATTGGTTAAACCC|   765   |   61   |     75 | 
+|AAATCATGATGCAAAACGGTTCAACAT|   387   |  154   |    156 | 
+|AAATCCCGATGCAAACTGGTACAACTC|   1849  |17374   |     20 |  
+|AAATCCCGATGCAAATCGGTTTAACTC|   2338  |  888   |    403 |  
+|AAATCGCGATGCAAAGCGGTTTAACCC|   1213  |  365   |    400 |  
 
 
 These can be read into R in the usual way
